@@ -23,8 +23,8 @@ if(!empty($_SERVER['HTTP_AUTHORIZATION'])) {
   $jwt = $_SERVER['HTTP_AUTHORIZATION'];
   try {
     //A diferencia del anterior backend, en este hemos modificado el contenido del token,
-    //añadiendole al final + idRol. Con la función explode se divide facilmente.
-    $jwt = explode('+',$jwt)[0];
+    //añadiendole al final ? idRol. Con la función explode se divide facilmente.
+    $jwt = explode('?',$jwt)[0];
 
     $JWTraw = JWT::decode($jwt, $bd->getClave(), array('HS256'));
     $idUser = $JWTraw->id;

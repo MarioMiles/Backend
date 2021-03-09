@@ -43,7 +43,7 @@ class AdminController {
       $user = json_decode(file_get_contents("php://input"));
 
       //Comprobamos que se hayan recibido todos los parametros.
-      if(!isset($user->id) || !isset($user->rolNuevo) || is_null($user->rolNuevo)) {
+      if(!isset($user->id) || !isset($user->rolNuevo) || !strlen($user->rolNuevo)) {
         http_response_code(400);
         exit(json_encode(["error" => "No se han enviado todos los parametros"]));
       }

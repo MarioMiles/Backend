@@ -68,7 +68,7 @@ class UserController {
         //Calculamos el token JWT y lo devolvemos.
         $jwt = JWT::encode($token, CJWT);
         http_response_code(200);
-        exit(json_encode($jwt . "+" . $resultado->idRol));
+        exit(json_encode($jwt . "?" . $resultado->idRol));
   
       } else {
         http_response_code(401);
@@ -171,7 +171,7 @@ class UserController {
       //Calculamos el token JWT y lo devolvemos.
       $jwt = JWT::encode($token, CJWT);
       http_response_code(201);
-      echo json_encode($jwt . "+1");
+      echo json_encode($jwt . "?1");
     } else {
       http_response_code(409);
       echo json_encode(["error" => "Ya existe este usuario"]);

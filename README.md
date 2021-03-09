@@ -52,6 +52,14 @@ Rutas actualmente implementadas organizadas por método y funcionalidad.
 | **PUT** |_localhost/backendphp/mensajes/_| Actualizar un mensaje enviado | Obligatorio |
 | **DELETE** |_localhost/backendphp/mensajes/id_| Eliminar un mensaje recibido | Obligatorio |
 
+#### Rutas relacionadas con la funcionalidad Administrador:
+
+| Método | Ruta | Acción | Requiere JWT |
+| :---: | --- | --- | :---: |
+| **GET** |_localhost/backendphp/admin/_| Obtener los usuarios registrados y sus roles | Obligatorio |
+| **GET** |_localhost/backendphp/admin/roles_| Obtener los roles disponibles | Obligatorio |
+| **PUT** |_localhost/backendphp/admin/_| Modifica el rol de un usuario | Obligatorio |
+
 #### Códigos de respuesta del servidor:
 
 | Código | Significado |
