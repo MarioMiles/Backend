@@ -16,25 +16,42 @@ $conexion = $bd->getConnection();
 
 //Comprueba si hay algún token valido en la cabecera y obtiene el ID del USER
 $idUser = null;
+//A su vez se obtiene el rol del usuario.
+$rolUser = null;
+
 if(!empty($_SERVER['HTTP_AUTHORIZATION'])) {
   $jwt = $_SERVER['HTTP_AUTHORIZATION'];
   try {
+    //A diferencia del anterior backend, en este hemos modificado el contenido del token,
+    //añadiendole al final + idRol. Con la función explode se divide facilmente.
+    $jwt = explode('+',$jwt)[0];
+
     $JWTraw = JWT::decode($jwt, $bd->getClave(), array('HS256'));
     $idUser = $JWTraw->id;
 
     //Aun pasando el proceso de verificación JWT se comprueba si en la base de datos existe el usuario.
-    $peticion = $conexion->prepare("SELECT id FROM users WHERE id = ?");
+    $peticion = $conexion->prepare("SELECT id,idRol FROM users WHERE id = ?");
     $peticion->execute([$idUser]);
-    if($peticion->rowCount() == 0) $idUser = null;
+    if($peticion->rowCount() == 0) {
+      $idUser = null;
+    } else {
+      $resultado = $peticion->fetchObject();
+      $rolUser = $resultado->idRol;
+    }
 
   } catch (Exception $e) { }
 }
-
-//Guardamos las variables globales. IDUSER, Metodo, CJWT, DIRECTORIO ROOT.
+//Guardamos las variables globales. IDUSER, ROLUSER, Metodo, CJWT, DIRECTORIO ROOT.
 define('IDUSER', $idUser);
+define('ROLUSER', $rolUser);
 define('METODO', $_SERVER["REQUEST_METHOD"]);
 define('ROOT', dirname(__FILE__) . DIRECTORY_SEPARATOR);
 define('CJWT', $bd->getClave());
+
+//También definimos los diferentes IDROL que tendrá nuestra aplicación y que corresponden con la tabla SQL.
+define('IDADMIN', 14);
+define('IDUSER1', 1);
+define('IDUSER2', 2);
 
 //Procesamos la ruta y los metodos.
 $control = explode('/',$url);
@@ -75,6 +92,23 @@ switch($control[0]) {
 
       default: exit(json_encode(["Bienvenido al Backend con routes"]));  
     }  
+    break;
+
+  case "admin":
+    require_once("controllers/admin.controller.php");
+    $admin = new AdminController($conexion);
+    switch(METODO) {
+      case "GET":
+        if(isset($control[1]) && $control[1] == "roles")
+          $admin->obtenerRoles();
+        else
+          $admin->obtenerUsers();
+        break;
+      case "PUT":
+        $admin->cambiarRol();
+        break;
+      default: exit(json_encode(["Bienvenido al Backend con routes"]));
+    }
     break;
 
   case "notas":
