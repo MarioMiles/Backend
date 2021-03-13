@@ -131,6 +131,26 @@ switch($control[0]) {
     }
     break;
 
+    case "mascotas":
+      require_once("controllers/mascotas.controller.php");
+      $mascotas = new MascotasController($conexion);
+      switch(METODO) {
+        case "GET":
+          $mascotas->obtenerMascotas();
+          break;
+        case "POST":
+          $mascotas->insertarMascotas();
+          break;
+        case "PUT":
+         $mascotas->editarMascota();
+          break;
+        case "DELETE":
+          $mascotas->eliminarMascota($control[1]);
+          break;
+        default: exit(json_encode(["Bienvenido al Backend con routes"]));
+      }
+      break;
+
     case "mensajes":
       require_once("controllers/mensajes.controller.php");
       $mensajes = new MensajesController($conexion);
