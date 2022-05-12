@@ -13,7 +13,7 @@ class UserController {
   public function listarUser() {
     //Comprueba si el usuario esta registrado.
     if(IDUSER) {
-      $eval = "SELECT id,nombre,apellidos,email,telefono,imgSrc FROM users";
+      $eval = "SELECT email, nombre, apellidos FROM users";
       $peticion = $this->db->prepare($eval);
       $peticion->execute();
       $resultado = $peticion->fetchAll(PDO::FETCH_OBJ);
@@ -26,7 +26,7 @@ class UserController {
 
   public function leerPerfil() {
     if(IDUSER) {
-      $eval = "SELECT nombre,apellidos,email,telefono,dni,imgSrc FROM users WHERE id=?";
+      $eval = "SELECT nombre,apellidos,email,telefono,dni,foto FROM users WHERE id=?";
       $peticion = $this->db->prepare($eval);
       $peticion->execute([IDUSER]);
       $resultado = $peticion->fetchObject();
@@ -47,7 +47,7 @@ class UserController {
     }
   
     //Primero busca si existe el usuario, si existe que obtener el id y la password.
-    $peticion = $this->db->prepare("SELECT id,idRol,password FROM users WHERE email = ?");
+    $peticion = $this->db->prepare("SELECT id,password FROM users WHERE email = ?");
     $peticion->execute([$user->email]);
     $resultado = $peticion->fetchObject();
   
@@ -68,7 +68,7 @@ class UserController {
         //Calculamos el token JWT y lo devolvemos.
         $jwt = JWT::encode($token, CJWT);
         http_response_code(200);
-        exit(json_encode($jwt . "?" . $resultado->idRol));
+        exit(json_encode($jwt . "?" . $resultado->id));
   
       } else {
         http_response_code(401);
@@ -82,6 +82,7 @@ class UserController {
   }
 
   public function subirAvatar() {
+    
     if(is_null(IDUSER)){
       http_response_code(401);
       exit(json_encode(["error" => "Fallo de autorizacion"]));
@@ -91,6 +92,8 @@ class UserController {
       $mime = $imagen['type'];
       $size = $imagen['size'];
       $rutaTemp = $imagen['tmp_name'];
+      
+      
   
       //Comprobamos que la imagen sea JPEG o PNG y que el tamaño sea menor que 400KB.
       if( !(strpos($mime, "jpeg") || strpos($mime, "png")) || ($size > 400000) ) {
@@ -100,7 +103,7 @@ class UserController {
   
         //Comprueba cual es la extensión del archivo.
         $ext = strpos($mime, "jpeg") ? ".jpg":".png";
-        $nombreFoto = "p-".IDUSER."-".time().$ext;
+        $nombreFoto = "p-".time().$ext;
         $ruta = ROOT."images/".$nombreFoto;
   
         //Comprobamos que el usuario no tenga mas fotos de perfil subidas al servidor.
@@ -113,11 +116,11 @@ class UserController {
         if(move_uploaded_file($rutaTemp,$ruta)) {
   
           //Prepara el contenido del campo imgSrc
-          $imgSRC = "http://localhost/".basename(ROOT)."/images/".$nombreFoto;
+          $foto = "http://localhost/backendphp/"."/images/".$nombreFoto;
   
-          $eval = "UPDATE users SET imgSrc=? WHERE id=?";
+          $eval = "UPDATE users SET foto=? WHERE id=?";
           $peticion = $this->db->prepare($eval);
-          $peticion->execute([$imgSRC,IDUSER]);
+          $peticion->execute([$foto,IDUSER]);
   
           http_response_code(201);
           exit(json_encode("Imagen actualizada correctamente"));

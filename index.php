@@ -111,9 +111,9 @@ switch($control[0]) {
     }
     break;
 
-  case "notas":
-    require_once("controllers/notas.controller.php");
-    $notas = new NotasController($conexion);
+  case "adopciones":
+    require_once("controllers/adopciones.controller.php");
+    $adopciones = new AdopcionesController($conexion);
     switch(METODO) {
       case "GET":
         $notas->obtenerNotas();
@@ -122,7 +122,7 @@ switch($control[0]) {
         $notas->publicarNota();
         break;
       case "PUT":
-        $notas->editarNota();
+        $adopciones->insertarAdopcion($control[1]);
         break;
       case "DELETE":
         $notas->eliminarNota($control[1]);
@@ -139,10 +139,15 @@ switch($control[0]) {
           $mascotas->obtenerMascotas();
           break;
         case "POST":
+          switch($control[1]) {
+          case "":
           $mascotas->insertarMascotas();
+          case "image":
+            $mascotas->subirAvatar($control[2]);
           break;
+          }
         case "PUT":
-         $mascotas->editarMascota();
+         $mascotas->editarMascota($control[1]);
           break;
         case "DELETE":
           $mascotas->eliminarMascota($control[1]);
@@ -150,6 +155,13 @@ switch($control[0]) {
         default: exit(json_encode(["Bienvenido al Backend con routes"]));
       }
       break;
+      case "POST":
+        switch($control[1]) {
+          case "image":
+            $mascotas->subirFoto();
+            break;
+        }
+        break;
 
     case "mensajes":
       require_once("controllers/mensajes.controller.php");
