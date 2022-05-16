@@ -55,8 +55,9 @@ define('IDUSER2', 2);
 
 //Procesamos la ruta y los metodos.
 $control = explode('/',$url);
-switch($control[0]) {
 
+switch($control[0]) {
+  
   case "user":
     require_once("controllers/user.controller.php");
     $user = new UserController($conexion);
@@ -112,17 +113,22 @@ switch($control[0]) {
     break;
 
   case "adopciones":
+    
     require_once("controllers/adopciones.controller.php");
     $adopciones = new AdopcionesController($conexion);
+    exit(json_encode([METODO]));
     switch(METODO) {
+      
       case "GET":
-        $notas->obtenerNotas();
+        exit(json_encode(["Bienvenidpapapappas"]));
+        $adopciones->comenzarAdopcion($control[1]);
         break;
       case "POST":
-        $notas->publicarNota();
+        exit(json_encode(["Bienvenidpapapappas"]));
+        $adopciones->comenzarAdopcion($control[1]);
         break;
       case "PUT":
-        $adopciones->insertarAdopcion($control[1]);
+        $adopciones->comenzarAdopcion($control[1]);
         break;
       case "DELETE":
         $notas->eliminarNota($control[1]);
@@ -136,14 +142,25 @@ switch($control[0]) {
       $mascotas = new MascotasController($conexion);
       switch(METODO) {
         case "GET":
-          $mascotas->obtenerMascotas();
-          break;
-        case "POST":
           switch($control[1]) {
           case "":
-          $mascotas->insertarMascotas();
+            $mascotas->obtenerMascotas();
+            break;
+          case "misMascotas":
+            $mascotas->obtenerMisMascotas($control[2]);
+            break;
+          }
+        case "POST":
+          
+          switch($control[1]) {
+          case "":
+            $mascotas->insertarMascotas();
+          break;
           case "image":
             $mascotas->subirAvatar($control[2]);
+          break;
+          case "confirmar":
+            $mascotas->comenzarAdopcion($control[2]);
           break;
           }
         case "PUT":
@@ -155,14 +172,7 @@ switch($control[0]) {
         default: exit(json_encode(["Bienvenido al Backend con routes"]));
       }
       break;
-      case "POST":
-        switch($control[1]) {
-          case "image":
-            $mascotas->subirFoto();
-            break;
-        }
-        break;
-
+      
     case "mensajes":
       require_once("controllers/mensajes.controller.php");
       $mensajes = new MensajesController($conexion);

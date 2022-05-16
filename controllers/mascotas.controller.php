@@ -11,9 +11,9 @@ class MascotasController {
   public function obtenerMascotas() {
     $busqueda = null;
     if(!empty($_GET["busqueda"])) $busqueda = $_GET["busqueda"];
-    $eval = "SELECT * FROM mascotas";
+    $eval = "SELECT * FROM mascotas WHERE adoptado=?";
     $peticion = $this->db->prepare($eval);
-    $peticion->execute();
+    $peticion->execute([0]);
     $resultado = $peticion->fetchAll(PDO::FETCH_OBJ);
     exit(json_encode($resultado));
   }
@@ -57,8 +57,8 @@ class MascotasController {
     $foto = "http://localhost/backendphp"."/images/".$nombreFoto;
     
    
-   $peticion = $this->db->prepare("INSERT INTO mascotas (nombre,tipoAni,peso,foto) VALUES (?,?,?,?)");
-    $resultado = $peticion->execute([$mascota->nombre,$mascota->tipoAni, $mascota->peso, $foto]);
+   $peticion = $this->db->prepare("INSERT INTO mascotas (nombre,tipoAni,peso,foto,idUsu) VALUES (?,?,?,?,?)");
+    $resultado = $peticion->execute([$mascota->nombre,$mascota->tipoAni, $mascota->peso, $foto, IDUSER]);
     http_response_code(201);
     exit(json_encode("Mascota creada correctamente"));
     }
@@ -197,4 +197,45 @@ class MascotasController {
         exit(json_encode(["error" => "No se han enviado todos los parametros"]));
       }
     }
+    public function obtenerMisMascotas($idUsu) {
+      
+      if(IDUSER) {
+        //Cogemos los valores de la peticion.
+        $mascota = json_decode(file_get_contents("php://input"));
+        
+      $busqueda = null;
+      if(!empty($_GET["busqueda"])) $busqueda = $_GET["busqueda"];
+      $eval = "SELECT * FROM mascotas WHERE idUsu=?";
+      
+      $peticion = $this->db->prepare($eval);
+      $peticion->execute([IDUSER]);
+      
+     
+      $resultado = $peticion->fetchAll(PDO::FETCH_OBJ);
+      
+      exit(json_encode($resultado));
+      }
+    }
+   
+	
+
+    public function comenzarAdopcion($id){
+     
+      $mascota = json_decode(file_get_contents("php://input"));
+      
+      $peticion = $this->db->prepare("INSERT INTO adopciones (idMas,idUsu) VALUES (?,?)");
+    $resultado = $peticion->execute([$id, IDUSER]);
+    $peticion2 = $this->db->prepare("UPDATE mascotas SET adoptado=? WHERE id=?");
+    $resul= $peticion2->execute(["si",$id]);
+   
+    exit(json_encode("La mascota con ID ".$id. " ha sido solicitada para adopción por el Usuario con id ".IDUSER));
+    http_response_code(201);
+   
+      
+      
+      
+      http_response_code(201);
+
+    }
+
 }
