@@ -220,7 +220,7 @@ class MascotasController {
 	
 
     public function comenzarAdopcion($id){
-     
+     if(IDUSER!=null){
       $mascota = json_decode(file_get_contents("php://input"));
       
       $peticion = $this->db->prepare("INSERT INTO adopciones (idMas,idUsu) VALUES (?,?)");
@@ -235,7 +235,14 @@ class MascotasController {
       
       
       http_response_code(201);
-
+     }else{
+      exit(json_encode(["error" => "Necesitas estar logeado para adoptar unas mascota"]));
+     }
+    }
+    public function filtrarPorTipo($tipoAni){
+      $peticion = $this->db->prepare("SELECT * FROM MASCOTAS WHERE tipoAni=?");
+      $resultado = $peticion->execute([$tipoAni]);
+      exit(json_encode($tipoAni));
     }
 
 }

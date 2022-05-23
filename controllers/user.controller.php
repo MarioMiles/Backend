@@ -50,7 +50,7 @@ class UserController {
     $peticion = $this->db->prepare("SELECT id,password FROM users WHERE email = ?");
     $peticion->execute([$user->email]);
     $resultado = $peticion->fetchObject();
-  
+    
     if($resultado) {
   
       //Si existe un usuario con ese email comprobamos que la contraseña sea correcta.
@@ -69,7 +69,7 @@ class UserController {
         $jwt = JWT::encode($token, CJWT);
         http_response_code(200);
         exit(json_encode($jwt . "?" . $resultado->id));
-  
+        
       } else {
         http_response_code(401);
         exit(json_encode(["error" => "Password incorrecta"]));
@@ -137,6 +137,7 @@ class UserController {
 
   public function registrarUser() {
     //Guardamos los parametros de la petición.
+    
     $user = json_decode(file_get_contents("php://input"));
 
     //Comprobamos que los datos sean consistentes.
@@ -155,10 +156,56 @@ class UserController {
     $resultado = $peticion->fetchObject();
     if(!$resultado) {
       $password = password_hash($user->password, PASSWORD_BCRYPT);
-      $eval = "INSERT INTO users (nombre,apellidos,password,email,telefono,dni) VALUES (?,?,?,?,?,?)";
+      $eval = "INSERT INTO users (nombre,apellidos,password,email,telefono,dni,rol) VALUES (?,?,?,?,?,?,?)";
       $peticion = $this->db->prepare($eval);
       $peticion->execute([
-        $user->nombre,$user->apellidos,$password,$user->email,$user->telefono,$user->dni
+        $user->nombre,$user->apellidos,$password,$user->email,$user->telefono,$user->dni,"user"
+      ]);
+      
+      //Preparamos el token.
+      $id = $this->db->lastInsertId();
+      $iat = time();
+      $exp = $iat + 3600*24*2;
+      $token = array(
+        "id" => $id,
+        "iat" => $iat,
+        "exp" => $exp
+      );
+
+      //Calculamos el token JWT y lo devolvemos.
+      $jwt = JWT::encode($token, CJWT);
+      http_response_code(201);
+      echo json_encode($jwt . "?1");
+    } else {
+      http_response_code(409);
+      echo json_encode(["error" => "Ya existe este usuario"]);
+    }
+  }
+  public function registrarAdmin() {
+   
+    //Guardamos los parametros de la petición.
+    $user = json_decode(file_get_contents("php://input"));
+
+    //Comprobamos que los datos sean consistentes.
+    if(!isset($user->email) || !isset($user->password)|| !isset($user->dni)) {
+      http_response_code(400);
+      exit(json_encode(["error" => "No se han enviado todos los parametros"]));
+
+    }
+    if(!isset($user->nombre)) $user->nombre = null;
+    if(!isset($user->apellidos)) $user->apellidos = null;
+    if(!isset($user->telefono)) $user->telefono = null;
+
+    //Comprueba que no exista otro usuario con el mismo email.
+    $peticion = $this->db->prepare("SELECT id FROM users WHERE email=?");
+    $peticion->execute([$user->email]);
+    $resultado = $peticion->fetchObject();
+    if(!$resultado) {
+      $password = password_hash($user->password, PASSWORD_BCRYPT);
+      $eval = "INSERT INTO users (nombre,apellidos,password,email,telefono,dni,rol) VALUES (?,?,?,?,?,?,?)";
+      $peticion = $this->db->prepare($eval);
+      $peticion->execute([
+        $user->nombre,$user->apellidos,$password,$user->email,$user->telefono,$user->dni,"admin"
       ]);
       
       //Preparamos el token.

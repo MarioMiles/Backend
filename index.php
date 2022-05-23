@@ -82,6 +82,8 @@ switch($control[0]) {
             break;
           case "":
             $user->registrarUser();
+          case "admin":
+            $user->registrarAdmin();
         }
         break;
       case "PUT":
@@ -149,6 +151,9 @@ switch($control[0]) {
           case "misMascotas":
             $mascotas->obtenerMisMascotas($control[2]);
             break;
+            case "filtrar":
+              $mascotas->filtrarPorTipo($control[2]);
+              break;  
           }
         case "POST":
           
