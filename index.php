@@ -90,14 +90,21 @@ switch($control[0]) {
         $user->editarUser();
         break;
       case "DELETE":
-        $user->eliminarUser();
+        
+        switch($control[1]) {
+        case "" :
+        $user->eliminarUsuario();
         break;
-
+        case "id":
+          
+          $user->eliminarUser($control[2]);
+          break;
+        }
       default: exit(json_encode(["Bienvenido al Backend con routes"]));  
     }  
     break;
 
-  case "admin":
+  /*case "admin":
     require_once("controllers/admin.controller.php");
     $admin = new AdminController($conexion);
     switch(METODO) {
@@ -112,7 +119,7 @@ switch($control[0]) {
         break;
       default: exit(json_encode(["Bienvenido al Backend con routes"]));
     }
-    break;
+    break;*/
 
   case "adopciones":
     
@@ -151,8 +158,8 @@ switch($control[0]) {
           case "misMascotas":
             $mascotas->obtenerMisMascotas($control[2]);
             break;
-            case "filtrar":
-              $mascotas->filtrarPorTipo($control[2]);
+            case "todas":
+              $mascotas->obtenerTodas();
               break;  
           }
         case "POST":

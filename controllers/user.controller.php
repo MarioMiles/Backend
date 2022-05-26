@@ -45,14 +45,15 @@ class UserController {
       http_response_code(400);
       exit(json_encode(["error" => "No se han enviado todos los parametros"]));
     }
+    
   
     //Primero busca si existe el usuario, si existe que obtener el id y la password.
-    $peticion = $this->db->prepare("SELECT id,password FROM users WHERE email = ?");
+    $peticion = $this->db->prepare("SELECT id,password,rol FROM users WHERE email = ?");
     $peticion->execute([$user->email]);
     $resultado = $peticion->fetchObject();
-    
+   
     if($resultado) {
-  
+      
       //Si existe un usuario con ese email comprobamos que la contraseña sea correcta.
       if(password_verify($user->password, $resultado->password)) {
   
@@ -64,7 +65,7 @@ class UserController {
           "iat" => $iat,
           "exp" => $exp
         );
-  
+     
         //Calculamos el token JWT y lo devolvemos.
         $jwt = JWT::encode($token, CJWT);
         http_response_code(200);
@@ -282,7 +283,7 @@ class UserController {
     }
   }
 
-  public function eliminarUser() {
+  public function eliminarUsuario() {
     if(IDUSER) {
         
       //Buscamos si el usuario tenía imagenes y la eliminamos.
@@ -301,4 +302,20 @@ class UserController {
       exit(json_encode(["error" => "Fallo de autorizacion"]));            
     }
   } 
+  public function eliminarUser($id) {
+    exit(json_encode($id));
+    if(empty($id)) {
+      http_response_code(400);
+      exit(json_encode(["error" => "Peticion mal formada"]));    
+    }
+   
+      $eval = "DELETE FROM users WHERE id=?";
+      $peticion = $this->db->prepare($eval);
+      $peticion->execute([$id]);
+      http_response_code(200);
+      //Comprobamos si se ha eliminado la mascota e informarnos en la respuesta.
+      if($peticion->rowCount()) exit(json_encode("usuario eliminado correctamente"));
+      else exit(json_encode("el usuario no se ha podido eliminar"));
+
+    }
 }

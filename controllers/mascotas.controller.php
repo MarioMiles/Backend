@@ -177,7 +177,7 @@ class MascotasController {
           if(move_uploaded_file($rutaTemp,$ruta)) {
     
             //Prepara el contenido del campo imgSrc
-            $foto = "http://localhost/backendphp/"."/images/".$nombreFoto;
+            $foto = "http://localhost/backendphp//images/".$nombreFoto;
     
             $eval = "UPDATE mascotas SET foto=? WHERE id=?";
             $peticion = $this->db->prepare($eval);
@@ -243,6 +243,15 @@ class MascotasController {
       $peticion = $this->db->prepare("SELECT * FROM MASCOTAS WHERE tipoAni=?");
       $resultado = $peticion->execute([$tipoAni]);
       exit(json_encode($tipoAni));
+    }
+    public function obtenerTodas() {
+      $busqueda = null;
+      if(!empty($_GET["busqueda"])) $busqueda = $_GET["busqueda"];
+      $eval = "SELECT * FROM mascotas";
+      $peticion = $this->db->prepare($eval);
+      $peticion->execute();
+      $resultado = $peticion->fetchAll(PDO::FETCH_OBJ);
+      exit(json_encode($resultado));
     }
 
 }
