@@ -67,6 +67,9 @@ switch($control[0]) {
           case "list":
             $user->listarUser();
             break;
+          case "rol":
+            $user->comprobarRol();
+            break;
           case "":
             $user->leerPerfil();
             break;
@@ -82,15 +85,24 @@ switch($control[0]) {
             break;
           case "":
             $user->registrarUser();
-          case "admin":
-            $user->registrarAdmin();
+          
         }
         break;
+        
       case "PUT":
+        switch($control[1]) {
+          case "":
         $user->editarUser();
         break;
+        case "admin":
+          $user->darAdmin($control[2]);
+          break;
+          case "user":
+            $user->quitarAdmin($control[2]);
+            break;
+      }
       case "DELETE":
-        
+     
         switch($control[1]) {
         case "" :
         $user->eliminarUsuario();
@@ -158,9 +170,13 @@ switch($control[0]) {
           case "misMascotas":
             $mascotas->obtenerMisMascotas($control[2]);
             break;
-            case "todas":
-              $mascotas->obtenerTodas();
-              break;  
+          case "todas":
+           $mascotas->obtenerTodas();
+            break;  
+          case "filtrar":
+            exit(json_encode("PAAPAPAPAP"));
+            $mascotas->filtrarPorTipo($control[2]);
+            break;
           }
         case "POST":
           

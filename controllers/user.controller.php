@@ -13,7 +13,7 @@ class UserController {
   public function listarUser() {
     //Comprueba si el usuario esta registrado.
     if(IDUSER) {
-      $eval = "SELECT email, nombre, apellidos FROM users";
+      $eval = "SELECT id, email, nombre, apellidos, foto, rol FROM users";
       $peticion = $this->db->prepare($eval);
       $peticion->execute();
       $resultado = $peticion->fetchAll(PDO::FETCH_OBJ);
@@ -26,7 +26,7 @@ class UserController {
 
   public function leerPerfil() {
     if(IDUSER) {
-      $eval = "SELECT nombre,apellidos,email,telefono,dni,foto FROM users WHERE id=?";
+      $eval = "SELECT id,nombre,apellidos,email,telefono,dni,foto,rol FROM users WHERE id=?";
       $peticion = $this->db->prepare($eval);
       $peticion->execute([IDUSER]);
       $resultado = $peticion->fetchObject();
@@ -135,6 +135,7 @@ class UserController {
       exit(json_encode(["error" => "No se han enviado todos los parametros"]));
     }
   }
+  
 
   public function registrarUser() {
     //Guardamos los parametros de la petición.
@@ -162,7 +163,7 @@ class UserController {
       $peticion->execute([
         $user->nombre,$user->apellidos,$password,$user->email,$user->telefono,$user->dni,"user"
       ]);
-      
+
       //Preparamos el token.
       $id = $this->db->lastInsertId();
       $iat = time();
@@ -182,52 +183,7 @@ class UserController {
       echo json_encode(["error" => "Ya existe este usuario"]);
     }
   }
-  public function registrarAdmin() {
-   
-    //Guardamos los parametros de la petición.
-    $user = json_decode(file_get_contents("php://input"));
-
-    //Comprobamos que los datos sean consistentes.
-    if(!isset($user->email) || !isset($user->password)|| !isset($user->dni)) {
-      http_response_code(400);
-      exit(json_encode(["error" => "No se han enviado todos los parametros"]));
-
-    }
-    if(!isset($user->nombre)) $user->nombre = null;
-    if(!isset($user->apellidos)) $user->apellidos = null;
-    if(!isset($user->telefono)) $user->telefono = null;
-
-    //Comprueba que no exista otro usuario con el mismo email.
-    $peticion = $this->db->prepare("SELECT id FROM users WHERE email=?");
-    $peticion->execute([$user->email]);
-    $resultado = $peticion->fetchObject();
-    if(!$resultado) {
-      $password = password_hash($user->password, PASSWORD_BCRYPT);
-      $eval = "INSERT INTO users (nombre,apellidos,password,email,telefono,dni,rol) VALUES (?,?,?,?,?,?,?)";
-      $peticion = $this->db->prepare($eval);
-      $peticion->execute([
-        $user->nombre,$user->apellidos,$password,$user->email,$user->telefono,$user->dni,"admin"
-      ]);
-      
-      //Preparamos el token.
-      $id = $this->db->lastInsertId();
-      $iat = time();
-      $exp = $iat + 3600*24*2;
-      $token = array(
-        "id" => $id,
-        "iat" => $iat,
-        "exp" => $exp
-      );
-
-      //Calculamos el token JWT y lo devolvemos.
-      $jwt = JWT::encode($token, CJWT);
-      http_response_code(201);
-      echo json_encode($jwt . "?1");
-    } else {
-      http_response_code(409);
-      echo json_encode(["error" => "Ya existe este usuario"]);
-    }
-  }
+  
 
   public function editarUser() {
     if(IDUSER) {
@@ -316,6 +272,94 @@ class UserController {
       //Comprobamos si se ha eliminado la mascota e informarnos en la respuesta.
       if($peticion->rowCount()) exit(json_encode("usuario eliminado correctamente"));
       else exit(json_encode("el usuario no se ha podido eliminar"));
+
+    }
+    public function darAdmin($id) {
+      
+      if(IDUSER) {
+        //Cogemos los valores de la peticion.
+        $user = json_decode(file_get_contents("php://input"));
+        
+        //Comprobamos si existe otro usuario con ese correo electronico.
+      
+  
+        //Obtenemos los datos guardados en el servidor relacionados con el usuario
+        $peticion = $this->db->prepare("SELECT rol FROM users WHERE id=?");
+        $peticion->execute([IDUSER]);
+        $resultado = $peticion->fetchObject();
+  
+        //Combinamos los datos de la petición y de los que había en la base de datos.
+        $nRol = isset($user->rol) ? $user->rol : $resultado->rol;
+        
+  
+        //Si hemos recibido el dato de modificar la password.
+       
+          $eval = "UPDATE users SET rol=? WHERE id=?";
+          $peticion = $this->db->prepare($eval);
+          $peticion->execute(["admin",$id]);        
+        
+        http_response_code(201);
+        exit(json_encode("Usuario actualizado correctamente"));
+      } else {
+        http_response_code(401);
+        exit(json_encode(["error" => "Fallo de autorizacion"]));         
+      }
+    }
+    public function quitarAdmin($id) {
+      
+      if(IDUSER) {
+        //Cogemos los valores de la peticion.
+        $user = json_decode(file_get_contents("php://input"));
+        
+        //Comprobamos si existe otro usuario con ese correo electronico.
+      
+  
+        //Obtenemos los datos guardados en el servidor relacionados con el usuario
+        $peticion = $this->db->prepare("SELECT rol FROM users WHERE id=?");
+        $peticion->execute([IDUSER]);
+        $resultado = $peticion->fetchObject();
+  
+        //Combinamos los datos de la petición y de los que había en la base de datos.
+        $nRol = isset($user->rol) ? $user->rol : $resultado->rol;
+        
+  
+        //Si hemos recibido el dato de modificar la password.
+       
+          $eval = "UPDATE users SET rol=? WHERE id=?";
+          $peticion = $this->db->prepare($eval);
+          $peticion->execute(["user",$id]);        
+        
+        http_response_code(201);
+        exit(json_encode("Usuario actualizado correctamente"));
+      } else {
+        http_response_code(401);
+        exit(json_encode(["error" => "Fallo de autorizacion"]));         
+      }
+    }
+    public function comprobarRol(){
+     
+      if(IDUSER) {
+        $eval = "SELECT rol FROM users WHERE id=?";
+        $peticion = $this->db->prepare($eval);
+        $peticion->execute([IDUSER]);
+        $resultado = $peticion->fetchObject();
+        $result=$resultado->rol;
+        
+       
+        if($result=="admin"){
+          $resul= true;
+          echo(json_encode([$result]));
+          
+         
+        }else{
+          $resul= false;
+          echo(json_encode([$result]));
+        }
+        
+      } else {
+        http_response_code(401);
+        exit(json_encode(["error" => "Fallo de autorizacion"]));       
+      }
 
     }
 }
