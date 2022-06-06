@@ -336,29 +336,16 @@ class UserController {
         exit(json_encode(["error" => "Fallo de autorizacion"]));         
       }
     }
-    public function comprobarRol(){
-     
-      if(IDUSER) {
-        $eval = "SELECT rol FROM users WHERE id=?";
+    public function obtenerUsuarioPorId($id){
+      if($id) {
+        $eval = "SELECT nombre,apellidos,email,telefono,dni,foto,rol FROM users WHERE id=?";
         $peticion = $this->db->prepare($eval);
-        $peticion->execute([IDUSER]);
+        $peticion->execute([$id]);
         $resultado = $peticion->fetchObject();
-        $result=$resultado->rol;
-        
-       
-        if($result=="admin"){
-          $resul= true;
-          echo(json_encode([$result]));
-          
-         
-        }else{
-          $resul= false;
-          echo(json_encode([$result]));
-        }
-        
+        exit(json_encode($resultado));
       } else {
         http_response_code(401);
-        exit(json_encode(["error" => "Fallo de autorizacion"]));       
+        exit(json_encode(["error" => "No se ha recibido el ID"]));       
       }
 
     }

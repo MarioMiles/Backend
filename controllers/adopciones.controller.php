@@ -21,4 +21,22 @@ class AdopcionesController {
     http_response_code(201);
 
   }
+  public function eliminarAdopcion($id) {
+    if(empty($id)) {
+      http_response_code(400);
+      exit(json_encode(["error" => "Peticion mal formada"]));    
+    }
+   
+      $eval = "DELETE FROM adopcion WHERE id=?";
+      $peticion = $this->db->prepare($eval);
+      $peticion->execute([$id]);
+      http_response_code(200);
+      
+
+      //Comprobamos si se ha eliminado la mascota e informarnos en la respuesta.
+      if($peticion->rowCount()) exit(json_encode("Adopcion eliminada correctamente"));
+      else exit(json_encode("La adopcion no se ha podido eliminar"));
+
+    }
+
 }

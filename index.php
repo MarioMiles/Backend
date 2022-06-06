@@ -73,6 +73,9 @@ switch($control[0]) {
           case "":
             $user->leerPerfil();
             break;
+          case "id":
+            $user->obtenerUsuarioPorId($control[2]);
+            break;
         }
         break;
       case "POST":
@@ -152,7 +155,7 @@ switch($control[0]) {
         $adopciones->comenzarAdopcion($control[1]);
         break;
       case "DELETE":
-        $notas->eliminarNota($control[1]);
+        $notas->eliminarAdopcion($control[1]);
         break;
       default: exit(json_encode(["Bienvenido al Backend con routes"]));
     }
@@ -173,9 +176,9 @@ switch($control[0]) {
           case "todas":
            $mascotas->obtenerTodas();
             break;  
-          case "filtrar":
-            exit(json_encode("PAAPAPAPAP"));
-            $mascotas->filtrarPorTipo($control[2]);
+          case "adoptadas":
+            
+            $mascotas->obtenerAdoptados();
             break;
           }
         case "POST":
@@ -192,9 +195,16 @@ switch($control[0]) {
           break;
           }
         case "PUT":
+          switch($control[1]) {
+          case "":
          $mascotas->editarMascota($control[1]);
           break;
+          case "cancelar":
+          $mascotas->cancelarAdopcion($control[1]);
+          break;
+          }
         case "DELETE":
+        
           $mascotas->eliminarMascota($control[1]);
           break;
         default: exit(json_encode(["Bienvenido al Backend con routes"]));

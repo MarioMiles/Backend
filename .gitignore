@@ -1,4 +1,4 @@
 #Archivos excluidos de git.
-composer.lock
+
 images/*
 !images/.gitkeep
