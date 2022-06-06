@@ -139,6 +139,8 @@ class MascotasController {
       $peticion = $this->db->prepare($eval);
       $peticion->execute([$id]);
       http_response_code(200);
+      
+
       //Comprobamos si se ha eliminado la mascota e informarnos en la respuesta.
       if($peticion->rowCount()) exit(json_encode("Mascota eliminada correctamente"));
       else exit(json_encode("La mascota no se ha podido eliminar"));
@@ -240,9 +242,15 @@ class MascotasController {
      }
     }
     public function filtrarPorTipo($tipoAni){
-      $peticion = $this->db->prepare("SELECT * FROM MASCOTAS WHERE tipoAni=?");
-      $resultado = $peticion->execute([$tipoAni]);
-      exit(json_encode($tipoAni));
+      
+      $mascota = json_decode(file_get_contents("php://input"));
+      $eval="SELECT * FROM mascotas WHERE tipoAni=?";
+      $peticion = $this->db->prepare($eval);
+      $tipoAni="{tipoAni: $tipoAni}";
+      $peticion->execute([$tipoAni]);
+      $resultado = $peticion->fetchAll(PDO::FETCH_OBJ);
+      exit(json_encode($peticion));
+    
     }
     public function obtenerTodas() {
       $busqueda = null;
@@ -253,5 +261,27 @@ class MascotasController {
       $resultado = $peticion->fetchAll(PDO::FETCH_OBJ);
       exit(json_encode($resultado));
     }
+    public function obtenerAdoptados(){
+      
+      if(!empty($_GET["busqueda"])) $busqueda = $_GET["busqueda"];
+      $eval = "SELECT * FROM ADOPCIONES,mascotas WHERE mascotas.idUsu=adopciones.idUsu 
+      and adopciones.idUsu=? and mascotas.adoptado='si'GROUP by mascotas.id";
+      $peticion = $this->db->prepare($eval);
+      $peticion->execute([IDUSER]);
+      $resultado = $peticion->fetchAll(PDO::FETCH_OBJ);
+      exit(json_encode($resultado));
+
+    }
+    public function cancelarAdopcion($id){
+     
+
+      $eval = "UPDATE mascotas SET adoptado=? WHERE id=?";
+      $peticion = $this->db->prepare($eval);
+      $peticion->execute(["0", $id]);
+      $resultado=$peticion;
+
+     exit(json_encode($resultado));
+     
+     }
 
 }
