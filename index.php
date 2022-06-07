@@ -1,4 +1,6 @@
 <?php
+ 
+ header("Access-Control-Allow-Origin: *");
 //Importamos las librerias necesarias.
 require_once 'config/db.php';
 require_once 'config/cors.php';

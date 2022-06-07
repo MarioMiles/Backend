@@ -1,4 +1,6 @@
 {
-    "lockfileVersion": 1
-  }
-  
+    "lockfileVersion": 1,
+    "dependencies": {
+        "planetscale-node": "^0.3.0"
+    }
+}
