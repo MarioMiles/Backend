@@ -1,5 +1,13 @@
 {
-    "require": {
-        "firebase/php-jwt": "^5.2"
+    "require" : {
+      "silex/silex": "^2.0.4",
+      "monolog/monolog": "^1.22",
+      "twig/twig": "^2.0",
+      "symfony/twig-bridge": "^3",
+      "firebase/php-jwt": "^5.2",
+        "alrik11es/cowsayphp": "^1.2"
+    },
+    "require-dev": {
+      "heroku/heroku-buildpack-php": "*"
     }
-}
+  }
