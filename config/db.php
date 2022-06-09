@@ -1,9 +1,9 @@
 <?php
 class db{
   private $host = "localhost";
-  private $database = "back";
-  private $user = "root";
-  private $password = "";
+  private $database = "id18038849_back";
+  private $user = "id18038849_mario";
+  private $password = "Olvidado01??";
   private $dbPDO;
   private $JWTkey = "ClaveSuperSecreta";
 
