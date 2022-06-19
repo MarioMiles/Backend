@@ -8,3 +8,5 @@ El administrador podrá tener acceso a las mascotas, usuarios y sugerencias. Con
 permisos de administrador a los demás usuarios y podrá leer y eliminar sugerencias, todo esto desde el Panel de administrador.
 Enlace:
 https://refugiovirtual-six.vercel.app/home
+MEMORIA:
+https://drive.google.com/file/d/1LTOW3svCnMRxVWPzuFAszsJ9IWwf4FVM/view?usp=sharing
